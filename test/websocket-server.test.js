@@ -280,13 +280,28 @@ describe('WebSocketServer', () => {
 
     it('cleans event handlers on precreated server', (done) => {
       const server = http.createServer();
+
+      // Keep count of counters before we add ours
+      const listener_listening_count = server.listenerCount('listening');
+      const listener_upgrade_count = server.listenerCount('upgrade');
+      const listener_error_count = server.listenerCount('error');
+
       const wss = new WebSocket.Server({ server });
 
       server.listen(0, () => {
         wss.close(() => {
-          assert.strictEqual(server.listenerCount('listening'), 0);
-          assert.strictEqual(server.listenerCount('upgrade'), 0);
-          assert.strictEqual(server.listenerCount('error'), 0);
+          assert.strictEqual(
+            server.listenerCount('listening'),
+            listener_listening_count
+          );
+          assert.strictEqual(
+            server.listenerCount('upgrade'),
+            listener_upgrade_count
+          );
+          assert.strictEqual(
+            server.listenerCount('error'),
+            listener_error_count
+          );
 
           server.close(done);
         });
